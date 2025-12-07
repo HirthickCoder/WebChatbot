@@ -1,3 +1,10 @@
+// API Configuration
+const API_BASE_URL = 'https://webscraperchatbot.onrender.com';
+
+// DOM Elements
+const companyNameInput = document.getElementById('companyName');
+const websiteUrlInput = document.getElementById('websiteUrl');
+const createChatbotBtn = document.getElementById('createChatbot');
 const statusMessage = document.getElementById('statusMessage');
 const chatMessages = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
