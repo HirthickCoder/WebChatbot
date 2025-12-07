@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">🤖</div>
+            <h1>AI Chatbot Assistant</h1>
+            <p class="subtitle">Powered by your deployed API</p>
+        </div>
+
+        <!-- Chatbot Creation Section -->
+        <div class="creation-section">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="companyName" 
+                    placeholder="Company Name (e.g., Syngrid)"
+                    class="input-field"
+                >
+            </div>
+            
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="websiteUrl" 
+                    placeholder="Website URL (e.g., https://syngrid.com)"
+                    class="input-field"
+                >
+            </div>
+            
+            <button id="createChatbot" class="create-btn">
+                <span class="btn-text">Create Chatbot</span>
+                <span class="btn-loader" style="display: none;">
+                    <span class="spinner"></span>
+                </span>
+            </button>
+            
+            <div id="statusMessage" class="status-message" style="display: none;">
+                ✅ Connected to API successfully!
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-status">
+                    <span class="status-dot"></span>
+                    <span id="chatStatusText">Hello! I'm your AI assistant. Create a chatbot above to get started, or just start chatting!</span>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-icon">🤖</div>
+                    <div class="message-content">
+                        <p>Hello! I'm your AI assistant. Create a chatbot above to get started, or just start chatting!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type your message here..."
+                    class="message-input"
+                >
+                <button id="sendMessage" class="send-btn">
+                    <span>Send</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
