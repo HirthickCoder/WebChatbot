@@ -74,29 +74,28 @@ def create_chatbot():
                 'error': scraped_result.get('error', 'Failed to scrape website')
             }), 500
         
-        # Save to database
-        print("Saving to database...")
-        company_id = database.save_company(company_name, website_url)
         
-        if not company_id:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to save company to database'
-            }), 500
-        
-        # Clear old scraped data for this company
-        database.clear_company_data(company_id)
-        
-        # Save scraped data
-        scraped_data = scraped_result['data']
-        
-        # Save different content types
-        database.save_scraped_data(company_id, 'title', scraped_data.get('title', ''))
-        database.save_scraped_data(company_id, 'meta_description', scraped_data.get('meta_description', ''))
-        database.save_scraped_data(company_id, 'full_text', scraped_data.get('full_text', ''))
-        database.save_scraped_data(company_id, 'contact_info', str(scraped_data.get('contact_info', {})))
-        database.save_scraped_data(company_id, 'services', ', '.join(scraped_data.get('services', [])))
-        database.save_scraped_data(company_id, 'about', ' '.join(scraped_data.get('about_section', [])))
+        # Save to database (optional - works without database)
+        company_id = None
+        try:
+            print("Saving to database...")
+            company_id = database.save_company(company_name, website_url)
+            
+            if company_id:
+                # Clear old scraped data for this company
+                database.clear_company_data(company_id)
+                
+                # Save scraped data
+                scraped_data = scraped_result['data']
+                database.save_scraped_data(company_id, 'title', scraped_data.get('title', ''))
+                database.save_scraped_data(company_id, 'meta_description', scraped_data.get('meta_description', ''))
+                database.save_scraped_data(company_id, 'full_text', scraped_data.get('full_text', ''))
+                database.save_scraped_data(company_id, 'contact_info', str(scraped_data.get('contact_info', {})))
+                database.save_scraped_data(company_id, 'services', ', '.join(scraped_data.get('services', [])))
+                print(f"Data saved to database! Company ID: {company_id}")
+        except Exception as db_error:
+            print(f"Database not available (this is OK): {str(db_error)}")
+            company_id = 1  # Use dummy ID for in-memory operation
         
         # Format context for AI
         context = scraper.format_scraped_data_for_ai(scraped_result)
@@ -108,16 +107,16 @@ def create_chatbot():
         current_chatbot['context'] = context
         current_chatbot['ready'] = True
         
-        print(f"Chatbot created successfully! Company ID: {company_id}")
+        print(f"Chatbot created successfully!")
         
         return jsonify({
             'success': True,
             'message': f'Chatbot created for {company_name}',
             'company_id': company_id,
             'data_extracted': {
-                'title': scraped_data.get('title', ''),
-                'services_count': len(scraped_data.get('services', [])),
-                'has_contact_info': bool(scraped_data.get('contact_info', {}).get('emails'))
+                'title': scraped_result['data'].get('title', ''),
+                'services_count': len(scraped_result['data'].get('services', [])),
+                'has_contact_info': bool(scraped_result['data'].get('contact_info', {}).get('emails'))
             }
         })
         
@@ -174,13 +173,16 @@ def chat():
         response_text = ai_result['response']
         response_time_ms = ai_result['response_time_ms']
         
-        # Save to chat history
-        database.save_chat_history(
-            current_chatbot['company_id'],
-            question,
-            response_text,
-            response_time_ms
-        )
+        # Save to chat history (optional)
+        try:
+            database.save_chat_history(
+                current_chatbot['company_id'],
+                question,
+                response_text,
+                response_time_ms
+            )
+        except Exception as db_error:
+            print(f"Could not save chat history (database not available): {str(db_error)}")
         
         print(f"Response generated in {response_time_ms}ms")
         
@@ -237,9 +239,13 @@ def test_db():
         }), 500
 
 if __name__ == '__main__':
-    # Initialize database tables
-    print("Initializing database...")
-    database.create_tables()
+    # Initialize database tables (optional)
+    try:
+        print("Initializing database...")
+        database.create_tables()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print(f"Database not available (running without database): {str(e)}")
     
     # Start Flask server
     print("Starting Flask server...")
